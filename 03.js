@@ -40,11 +40,9 @@ class MahasiswaAlumni extends Mahasiswa {
 }
 
 // Buat 3 Object
-const mhs1 = new Mahasiswa("Ahmad Sopandi", "12345", "Informatika");
-const mhs2 = new MahasiswaAktif("Budi", "67890", "Sistem Informasi", 2023);
-const mhs3 = new MahasiswaAlumni("Citra", "11223", "Teknik Industri", 2022);
-
-// Panggil Method
+const mhs1 = new Mahasiswa("Ahmad Sopandi", "202401110074", "Informatika");
+const mhs2 = new MahasiswaAktif("Dimas", "202401110085", "Sistem Informasi", 2023);
+const mhs3 = new MahasiswaAlumni("Agung", "202401110023", "Informatika", 2022);
 mhs1.belajar();         // method 1
 mhs1.tampilkanData();   // method 2
 mhs2.ikutOrganisasi();  // method 3
