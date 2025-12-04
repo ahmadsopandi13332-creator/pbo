@@ -6,6 +6,7 @@
     <title>GUI Sederhana</title>
 </head>
 <body>
+
     <h1 id="title">Halo, Mahasiswa!</h1>
     <button onclick="ubahTeks()">Klik Saya</button>
 
@@ -14,5 +15,49 @@
             document.getElementById("title").innerText = "Teks telah berubah!";
         }
     </script>
+
+    <!-- Paragraf "header list" -->
+    <h2>Header List</h2>
+    <p>Ini adalah contoh paragraf untuk bagian header list yang dapat kamu gunakan sebagai deskripsi atau pengantar.</p>
+
+    <!-- Table TD / TH / TR -->
+    <h2>Contoh Tabel</h2>
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>Nama</th>
+            <th>Umur</th>
+        </tr>
+        <tr>
+            <td>Ahmad Sopandi</td>
+            <td>19</td>
+        </tr>
+        <tr>
+            <td>Didi</td>
+            <td>22</td>
+        </tr>
+    </table>
+
+    <!-- Image (nanti tinggal upload foto) -->
+    <h2>Contoh Gambar</h2>
+    <img src="foto.jpg" alt="Gambar nanti diupload" width="200">
+
+    <!-- Form input + button -->
+    <h2>Form Input</h2>
+    <form>
+        <label>Masukkan Nama:</label><br>
+        <input type="text" id="namaInput"><br><br>
+
+        <button type="button" onclick="tampilkanNama()">Submit</button>
+    </form>
+
+    <p id="output"></p>
+
+    <script>
+        function tampilkanNama() {
+            const nama = document.getElementById("namaInput").value;
+            document.getElementById("output").innerText = "Nama yang dimasukkan: " + nama;
+        }
+    </script>
+
 </body>
 </html>
