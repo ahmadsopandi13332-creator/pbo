@@ -1,70 +1,43 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GUI Sederhana</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,
+initial-scale=1.0">
+<title>GUI Sederhana</title>
 </head>
 <body>
+<h1 id="title">Halo, Mahasiswa!</h1>
+<h2>Halo, Mahasiswa!</h2>
+<b> tebal</b>
+<i> miring</i>
+    <ol>
+      <li>satu</li>
+      <li>dua</li>
+    </ol>
+  <table>
+<tr>  <td> 1 </td>  <td> 2 </td></tr>
+<tr>  <td> 3 </td>  <td> 4 </td></tr>  
+  </table>
 
-    <!-- Judul utama + tombol ubah teks -->
-    <h1 id="title">Halo, Mahasiswa!</h1>
-    <button onclick="ubahTeks()">Klik Saya</button>
+<img src='https://raw.githubusercontent.com/ahmadsopandi13332-creator/pbo/main/logo%20man%203%20bogor.jpg'>
 
-    <script>
-        function ubahTeks() {
-            document.getElementById("title").innerText = "Teks telah berubah!";
-        }
-    </script>
+  <form>
+<input type='text' value='cobaan'>
+<input type='submit' value='kirim'>
+    
+  </form>
 
-    <!-- Paragraf (Header List) -->
-    <h2>Header List</h2>
-    <p>
-        Ini adalah contoh paragraf pada bagian header list. 
-        Kamu dapat menggunakannya sebagai penjelasan, deskripsi, atau keterangan lain.
-    </p>
 
-    <!-- Contoh tabel -->
-    <h2>Contoh Tabel</h2>
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>Nama</th>
-            <th>Umur</th>
-        </tr>
-        <tr>
-            <td>Ahmad Sopandi</td>
-            <td>19</td>
-        </tr>
-        <tr>
-            <td>Didi</td>
-            <td>22</td>
-        </tr>
-    </table>
+  
+<button onclick="ubahTeks()">Klik Saya</button>
 
-    <!-- Gambar dari GitHub -->
-    <h2>Logo MAN 3 Bogor</h2>
-    <img 
-        src="https://raw.githubusercontent.com/ahmadsopandi13332-creator/pbo/main/logo%20man%203%20bogor.jpg" 
-        alt="Logo MAN 3 Bogor" 
-        width="250">
-
-    <!-- Form Input + Button -->
-    <h2>Form Input</h2>
-    <form>
-        <label>Masukkan Nama:</label><br>
-        <input type="text" id="namaInput"><br><br>
-
-        <button type="button" onclick="tampilkanNama()">Submit</button>
-    </form>
-
-    <p id="output"></p>
-
-    <script>
-        function tampilkanNama() {
-            const nama = document.getElementById("namaInput").value;
-            document.getElementById("output").innerText = "Nama yang dimasukkan: " + nama;
-        }
-    </script>
-
+  
+<script>
+function ubahTeks() {
+document.getElementById("title").innerText = "Teks telah berubah!";
+}
+</script>
 </body>
 </html>
+        
