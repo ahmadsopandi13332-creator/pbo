@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Portal</title>
     <style>
-        /* Reset dan global styles */
         * {
             margin: 0;
             padding: 0;
@@ -15,7 +14,7 @@
         
         html, body {
             height: 100%;
-            overflow: hidden; /* Nonaktifkan scroll */
+            overflow: hidden;
         }
         
         body {
@@ -27,51 +26,15 @@
             padding: 20px;
         }
         
-        /* Container utama dengan bentuk lonjong */
         .container {
             background: rgba(255, 255, 255, 0.95);
             padding: 40px;
-            border-radius: 35px 15px 35px 15px; /* Efek lonjong */
+            border-radius: 35px 15px 35px 15px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 420px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
         
-        /* Efek dekoratif untuk container */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200px;
-            height: 200px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 50%;
-            z-index: 0;
-        }
-        
-        .container::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -30%;
-            width: 150px;
-            height: 150px;
-            background: rgba(118, 75, 162, 0.1);
-            border-radius: 50%;
-            z-index: 0;
-        }
-        
-        /* Konten di atas efek dekoratif */
-        .container > * {
-            position: relative;
-            z-index: 1;
-        }
-        
-        /* Header */
         .login-header {
             text-align: center;
             margin-bottom: 25px;
@@ -82,18 +45,16 @@
             font-size: 32px;
             font-weight: 700;
             margin-bottom: 10px;
-            letter-spacing: 1px;
         }
         
         .login-subtitle {
             color: #666;
             font-size: 14px;
             line-height: 1.5;
-            max-width: 320px;
             margin: 0 auto 15px;
+            max-width: 320px;
         }
         
-        /* Form styles */
         .form-group {
             margin-bottom: 22px;
         }
@@ -112,7 +73,6 @@
             border: 2px solid #e1e5e9;
             border-radius: 10px;
             font-size: 16px;
-            transition: all 0.3s;
             background: #f8f9fa;
         }
         
@@ -120,10 +80,8 @@
             outline: none;
             border-color: #667eea;
             background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
-        /* Tombol */
         .button-group {
             display: flex;
             gap: 15px;
@@ -138,8 +96,6 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
         }
         
         .btn-login {
@@ -147,22 +103,11 @@
             color: white;
         }
         
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
         .btn-cancel {
             background: #f1f3f5;
             color: #666;
         }
         
-        .btn-cancel:hover {
-            background: #e9ecef;
-            transform: translateY(-2px);
-        }
-        
-        /* Link lupa password */
         .forgot-link {
             text-align: center;
             margin-top: 20px;
@@ -173,15 +118,8 @@
             text-decoration: none;
             font-weight: 500;
             font-size: 15px;
-            transition: color 0.3s;
         }
         
-        .forgot-link a:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-        
-        /* Halaman dashboard */
         #dashboardPage {
             display: none;
             text-align: center;
@@ -209,15 +147,8 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
         }
         
-        .btn-logout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-        }
-        
-        /* Pesan error dan success */
         .message {
             padding: 12px 15px;
             border-radius: 8px;
@@ -236,26 +167,6 @@
             background: #f0fff4;
             color: #38a169;
             border: 1px solid #c6f6d5;
-        }
-        
-        /* Responsif untuk mobile */
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 25px;
-                border-radius: 25px 10px 25px 10px;
-            }
-            
-            .button-group {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .login-header h1 {
-                font-size: 28px;
-            }
         }
     </style>
 </head>
@@ -307,12 +218,28 @@
     </div>
 
     <script>
-        // Data user untuk login
-        const users = {
-            'AhmadSopandi': 'didi123'
+        // ========== INISIALISASI DATASET ==========
+        // Hapus semua data lama
+        localStorage.clear();
+        
+        // Simpan SATU user saja: username dan password
+        const userData = {
+            username: "AhmadSopandi",
+            password: "didi123"
         };
         
-        // Elemen DOM
+        // Simpan ke Local Storage
+        localStorage.setItem('userData', JSON.stringify(userData));
+        
+        console.log('Data disimpan di Local Storage:', userData);
+        
+        // ========== FUNGSI UNTUK BACA DATA ==========
+        function getUserData() {
+            const data = localStorage.getItem('userData');
+            return data ? JSON.parse(data) : null;
+        }
+        
+        // ========== ELEMEN DOM ==========
         const loginPage = document.getElementById('loginPage');
         const dashboardPage = document.getElementById('dashboardPage');
         const loginForm = document.getElementById('loginForm');
@@ -323,72 +250,72 @@
         const cancelBtn = document.getElementById('cancelBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         
-        // Proses login
+        // ========== LOGIN ==========
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
+            const inputUsername = document.getElementById('username').value.trim();
+            const inputPassword = document.getElementById('password').value;
             
             // Reset pesan
             errorMessage.style.display = 'none';
             successMessage.style.display = 'none';
             
-            // Validasi input
-            if (!username || !password) {
+            // Validasi
+            if (!inputUsername || !inputPassword) {
                 showError('Harap isi username dan password!');
                 return;
             }
             
-            // Cek kredensial
-            if (users[username] && users[username] === password) {
+            // Ambil data dari Local Storage
+            const userData = getUserData();
+            
+            // Cek login
+            if (userData && 
+                userData.username === inputUsername && 
+                userData.password === inputPassword) {
+                
                 // Login berhasil
-                userName.textContent = username;
+                userName.textContent = userData.username;
                 loginPage.style.display = 'none';
                 dashboardPage.style.display = 'block';
                 
-                // Simpan status login (opsional)
-                localStorage.setItem('loggedInUser', username);
+                // Simpan status login
+                localStorage.setItem('isLoggedIn', 'true');
+                
             } else {
-                // Login gagal
                 showError('Username atau password salah!');
             }
         });
         
-        // Fungsi tampilkan error
+        // ========== FUNGSI BANTU ==========
         function showError(text) {
             errorMessage.textContent = text;
             errorMessage.style.display = 'block';
         }
         
-        // Fungsi tampilkan success
         function showSuccess(text) {
             successMessage.textContent = text;
             successMessage.style.display = 'block';
         }
         
-        // Link Lupa Password
+        // ========== EVENT LISTENERS ==========
         forgotLink.addEventListener('click', function() {
             const username = document.getElementById('username').value;
+            const userData = getUserData();
             
-            if (users[username]) {
-                // Jika username ada di sistem
-                showSuccess(`Instruksi reset password telah dikirim ke email terdaftar untuk akun "${username}"`);
-                
-                // Auto clear setelah 5 detik
+            if (userData && username === userData.username) {
+                showSuccess(`Password untuk ${username} adalah: ${userData.password}`);
                 setTimeout(() => {
                     successMessage.style.display = 'none';
                 }, 5000);
             } else if (username) {
-                // Jika username diisi tapi tidak terdaftar
-                showError(`Username "${username}" tidak ditemukan dalam sistem`);
+                showError(`Username "${username}" tidak ditemukan`);
             } else {
-                // Jika username kosong
-                showError('Harap masukkan username terlebih dahulu');
+                showError('Masukkan username terlebih dahulu');
             }
         });
         
-        // Tombol Cancel
         cancelBtn.addEventListener('click', function() {
             loginForm.reset();
             errorMessage.style.display = 'none';
@@ -396,52 +323,35 @@
             document.getElementById('username').focus();
         });
         
-        // Tombol Logout
         logoutBtn.addEventListener('click', function() {
-            if (confirm('Apakah Anda yakin ingin logout?')) {
-                // Reset form
+            if (confirm('Yakin ingin logout?')) {
                 loginForm.reset();
-                
-                // Kembali ke halaman login
                 dashboardPage.style.display = 'none';
                 loginPage.style.display = 'block';
-                
-                // Hapus status login
-                localStorage.removeItem('loggedInUser');
-                
-                // Reset pesan
+                localStorage.removeItem('isLoggedIn');
                 errorMessage.style.display = 'none';
                 successMessage.style.display = 'none';
-                
-                // Fokus ke input username
                 document.getElementById('username').focus();
             }
         });
         
-        // Cek jika sudah login sebelumnya
+        // ========== INISIALISASI ==========
         window.addEventListener('load', function() {
-            const savedUser = localStorage.getItem('loggedInUser');
-            
-            if (savedUser && users[savedUser]) {
-                // Auto login jika ada data tersimpan
-                userName.textContent = savedUser;
-                loginPage.style.display = 'none';
-                dashboardPage.style.display = 'block';
-            } else {
-                // Fokus ke input username
-                document.getElementById('username').focus();
+            // Cek jika sudah login
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                const userData = getUserData();
+                if (userData) {
+                    userName.textContent = userData.username;
+                    loginPage.style.display = 'none';
+                    dashboardPage.style.display = 'block';
+                    return;
+                }
             }
             
-            // Nonaktifkan scroll dengan keyboard
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || 
-                    e.key === 'PageUp' || e.key === 'PageDown' ||
-                    e.key === ' ' || e.key === 'Spacebar') {
-                    e.preventDefault();
-                }
-            });
+            // Fokus ke input username
+            document.getElementById('username').focus();
             
-            // Nonaktifkan scroll dengan mouse wheel
+            // Nonaktifkan scroll
             document.addEventListener('wheel', function(e) {
                 e.preventDefault();
             }, { passive: false });
