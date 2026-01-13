@@ -32,7 +32,7 @@
             border-radius: 35px 15px 35px 15px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 420px;
+            max-width: 450px;
         }
         
         .login-header {
@@ -74,12 +74,14 @@
             border-radius: 10px;
             font-size: 16px;
             background: #f8f9fa;
+            transition: all 0.3s ease;
         }
         
         .form-group input:focus {
             outline: none;
             border-color: #667eea;
             background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .button-group {
@@ -96,16 +98,40 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .btn-login {
-            background: linear-gradient(to right, #667eea, #764ba2);
+            background: linear-gradient(to right, #4CAF50, #45a049);
             color: white;
         }
         
+        .btn-login:hover {
+            background: linear-gradient(to right, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
         .btn-cancel {
-            background: #f1f3f5;
-            color: #666;
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn-cancel:active {
+            transform: translateY(0);
         }
         
         .forgot-link {
@@ -118,245 +144,294 @@
             text-decoration: none;
             font-weight: 500;
             font-size: 15px;
+            transition: color 0.3s;
         }
         
-        #dashboardPage {
-            display: none;
+        .forgot-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .welcome-container {
             text-align: center;
         }
         
-        .welcome-icon {
-            font-size: 60px;
-            color: #4CAF50;
-            margin-bottom: 20px;
+        .welcome-message {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
         }
         
-        .welcome-message {
-            color: #333;
-            font-size: 20px;
-            margin-bottom: 25px;
+        .welcome-subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
             line-height: 1.5;
         }
         
         .btn-logout {
             background: linear-gradient(to right, #ff6b6b, #ff4757);
             color: white;
-            padding: 16px 40px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
+            width: 200px;
+            margin: 0 auto;
         }
         
-        .message {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
+        .btn-logout:hover {
+            background: linear-gradient(to right, #ff4757, #ff2e43);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
         }
         
-        .error {
-            background: #fff5f5;
-            color: #e53e3e;
-            border: 1px solid #fed7d7;
-        }
-        
-        .success {
-            background: #f0fff4;
-            color: #38a169;
-            border: 1px solid #c6f6d5;
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 25px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn-logout {
+                width: 100%;
+            }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Halaman Login -->
-    <div class="container" id="loginPage">
-        <div class="login-header">
-            <h1>Login</h1>
-            <p class="login-subtitle">
-                Login dengan akun Anda untuk mendapatkan notifikasi berita up to date dan berlangganan
-            </p>
-        </div>
-        
-        <div class="message error" id="errorMessage"></div>
-        <div class="message success" id="successMessage"></div>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Masukkan username Anda" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Masukkan password Anda" required>
-            </div>
-            
-            <div class="button-group">
-                <button type="submit" class="btn btn-login">Login</button>
-                <button type="button" class="btn btn-cancel" id="cancelBtn">Cancel</button>
-            </div>
-        </form>
-        
-        <div class="forgot-link">
-            <a id="forgotLink">Lupa password?</a>
-        </div>
-    </div>
-    
-    <!-- Halaman Setelah Login -->
-    <div class="container" id="dashboardPage">
-        <div class="welcome-icon">✓</div>
-        
-        <div class="welcome-message">
-            Hallo <span id="userName">Admin</span>,<br>
-            Selamat datang di sistem portal berita
-        </div>
-        
-        <button class="btn-logout" id="logoutBtn">Logout</button>
-    </div>
+    <div id="app"></div>
 
     <script>
-        // ========== INISIALISASI DATASET ==========
-        // Hapus semua data lama
-        localStorage.clear();
+        // ========== KELAS DAN OBJECT ==========
         
-        // Simpan SATU user saja: username dan password
-        const userData = {
-            username: "AhmadSopandi",
-            password: "didi123"
-        };
-        
-        // Simpan ke Local Storage
-        localStorage.setItem('userData', JSON.stringify(userData));
-        
-        console.log('Data disimpan di Local Storage:', userData);
-        
-        // ========== FUNGSI UNTUK BACA DATA ==========
-        function getUserData() {
-            const data = localStorage.getItem('userData');
-            return data ? JSON.parse(data) : null;
+        // 1. CLASS USER
+        class User {
+            constructor(username, password) {
+                this.username = username;
+                this.password = password;
+            }
+            
+            validateLogin(inputUsername, inputPassword) {
+                return this.username === inputUsername && this.password === inputPassword;
+            }
         }
         
-        // ========== ELEMEN DOM ==========
-        const loginPage = document.getElementById('loginPage');
-        const dashboardPage = document.getElementById('dashboardPage');
-        const loginForm = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const userName = document.getElementById('userName');
-        const forgotLink = document.getElementById('forgotLink');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        
-        // ========== LOGIN ==========
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const inputUsername = document.getElementById('username').value.trim();
-            const inputPassword = document.getElementById('password').value;
-            
-            // Reset pesan
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
-            
-            // Validasi
-            if (!inputUsername || !inputPassword) {
-                showError('Harap isi username dan password!');
-                return;
+        // 2. CLASS AUTH SYSTEM
+        class AuthSystem {
+            constructor() {
+                this.currentUser = null;
+                this.userData = {
+                    username: "AhmadSopandi",
+                    password: "didi123"
+                };
             }
             
-            // Ambil data dari Local Storage
-            const userData = getUserData();
-            
-            // Cek login
-            if (userData && 
-                userData.username === inputUsername && 
-                userData.password === inputPassword) {
-                
-                // Login berhasil
-                userName.textContent = userData.username;
-                loginPage.style.display = 'none';
-                dashboardPage.style.display = 'block';
-                
-                // Simpan status login
-                localStorage.setItem('isLoggedIn', 'true');
-                
-            } else {
-                showError('Username atau password salah!');
+            login(username, password) {
+                if (username === this.userData.username && password === this.userData.password) {
+                    this.currentUser = new User(username, password);
+                    localStorage.setItem('loggedInUser', username);
+                    return true;
+                }
+                return false;
             }
-        });
-        
-        // ========== FUNGSI BANTU ==========
-        function showError(text) {
-            errorMessage.textContent = text;
-            errorMessage.style.display = 'block';
+            
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('loggedInUser');
+            }
+            
+            checkLogin() {
+                const savedUser = localStorage.getItem('loggedInUser');
+                if (savedUser === this.userData.username) {
+                    this.currentUser = new User(savedUser, this.userData.password);
+                    return this.currentUser;
+                }
+                return null;
+            }
+            
+            forgotPassword(username) {
+                if (username === this.userData.username) {
+                    // Jangan tampilkan password langsung! Kirim email atau reset password
+                    return "hayohhh pikirkan dulu apa passwordnya ";
+                }
+                return "Username tidak ditemukan";
+            }
         }
         
-        function showSuccess(text) {
-            successMessage.textContent = text;
-            successMessage.style.display = 'block';
-        }
-        
-        // ========== EVENT LISTENERS ==========
-        forgotLink.addEventListener('click', function() {
-            const username = document.getElementById('username').value;
-            const userData = getUserData();
+        // 3. CLASS UI MANAGER
+        class UIManager {
+            constructor(containerId, authSystem) {
+                this.container = document.getElementById(containerId);
+                this.auth = authSystem;
+            }
             
-            if (userData && username === userData.username) {
-                showSuccess(`Password untuk ${username} adalah: ${userData.password}`);
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                }, 5000);
-            } else if (username) {
-                showError(`Username "${username}" tidak ditemukan`);
-            } else {
-                showError('Masukkan username terlebih dahulu');
-            }
-        });
-        
-        cancelBtn.addEventListener('click', function() {
-            loginForm.reset();
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
-            document.getElementById('username').focus();
-        });
-        
-        logoutBtn.addEventListener('click', function() {
-            if (confirm('Yakin ingin logout?')) {
-                loginForm.reset();
-                dashboardPage.style.display = 'none';
-                loginPage.style.display = 'block';
-                localStorage.removeItem('isLoggedIn');
-                errorMessage.style.display = 'none';
-                successMessage.style.display = 'none';
-                document.getElementById('username').focus();
-            }
-        });
-        
-        // ========== INISIALISASI ==========
-        window.addEventListener('load', function() {
-            // Cek jika sudah login
-            if (localStorage.getItem('isLoggedIn') === 'true') {
-                const userData = getUserData();
-                if (userData) {
-                    userName.textContent = userData.username;
-                    loginPage.style.display = 'none';
-                    dashboardPage.style.display = 'block';
-                    return;
+            render() {
+                if (this.auth.currentUser) {
+                    this.showWelcomePage();
+                } else {
+                    this.showLoginPage();
                 }
             }
             
-            // Fokus ke input username
-            document.getElementById('username').focus();
+            showLoginPage() {
+                this.container.innerHTML = `
+                    <div class="container">
+                        <div class="login-header">
+                            <h1>Login</h1>
+                            <p class="login-subtitle">
+                                Login dengan akun Anda untuk mendapatkan notifikasi berita up to date dan berlangganan
+                            </p>
+                        </div>
+                        
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" placeholder="Masukkan username Anda" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" placeholder="Masukkan password Anda" required>
+                            </div>
+                            
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-login">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </button>
+                                <button type="button" class="btn btn-cancel" id="cancelBtn">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="forgot-link">
+                            <a id="forgotLink"><i class="fas fa-key"></i> Lupa password?</a>
+                        </div>
+                    </div>
+                `;
+            }
             
-            // Nonaktifkan scroll
-            document.addEventListener('wheel', function(e) {
-                e.preventDefault();
-            }, { passive: false });
+            showWelcomePage() {
+                this.container.innerHTML = `
+                    <div class="container">
+                        <div class="welcome-container">
+                            <h1 class="welcome-message">Hallo ${this.auth.currentUser.username},</h1>
+                            <p class="welcome-subtitle">Selamat datang di sistem portal berita, yang menyajikan informasi terkini, terupdate dan bagus.</p>
+                            
+                            <button class="btn btn-logout" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            setupEvents() {
+                document.addEventListener('submit', (e) => {
+                    if (e.target.id === 'loginForm') {
+                        e.preventDefault();
+                        this.handleLogin();
+                    }
+                });
+                
+                document.addEventListener('click', (e) => {
+                    const id = e.target.id || e.target.closest('button')?.id;
+                    
+                    switch(id) {
+                        case 'cancelBtn':
+                            this.clearForm();
+                            break;
+                        case 'forgotLink':
+                            this.handleForgotPassword();
+                            break;
+                        case 'logoutBtn':
+                            this.handleLogout();
+                            break;
+                    }
+                });
+            }
+            
+            handleLogin() {
+                const username = document.getElementById('username')?.value.trim();
+                const password = document.getElementById('password')?.value;
+                
+                if (!username || !password) {
+                    alert('Harap isi username dan password!');
+                    return;
+                }
+                
+                if (this.auth.login(username, password)) {
+                    this.render();
+                } else {
+                    alert('Username atau password salah!');
+                }
+            }
+            
+            handleLogout() {
+                if (confirm('Apakah Anda yakin ingin logout?')) {
+                    this.auth.logout();
+                    this.render();
+                    this.clearForm();
+                }
+            }
+            
+            handleForgotPassword() {
+                const username = document.getElementById('username')?.value.trim();
+                
+                if (!username) {
+                    alert('Masukkan username terlebih dahulu');
+                    return;
+                }
+                
+                const result = this.auth.forgotPassword(username);
+                alert(result);
+            }
+            
+            clearForm() {
+                const usernameInput = document.getElementById('username');
+                const passwordInput = document.getElementById('password');
+                
+                if (usernameInput) usernameInput.value = '';
+                if (passwordInput) passwordInput.value = '';
+                if (usernameInput) usernameInput.focus();
+            }
+        }
+        
+        // 4. CLASS MAIN APP
+        class LoginApp {
+            constructor() {
+                this.auth = new AuthSystem();
+                this.ui = new UIManager('app', this.auth);
+                this.init();
+            }
+            
+            init() {
+                this.auth.checkLogin();
+                this.ui.render();
+                this.ui.setupEvents();
+                this.disableScroll();
+            }
+            
+            disableScroll() {
+                document.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
+                document.addEventListener('keydown', (e) => {
+                    if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'].includes(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        }
+        
+        // ========== OBJECT INSTANSIASI ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = new LoginApp();
+            
+            // Untuk debugging
+            console.log('Aplikasi Login dengan PBO siap!');
+            console.log('Username: AhmadSopandi');
+            console.log('Password: dirahasiakan (tidak ditampilkan)');
         });
+        
     </script>
 </body>
 </html>
-
