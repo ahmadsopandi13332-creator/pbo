@@ -1,208 +1,375 @@
-<script>
-const STORAGE_KEY = "users";
-
-const columns = ["id","user","nama","sandi","status"];
-
-let selectedIndex = -1;
-
-function getData() {
-    try {
-        const data = localStorage.getItem(STORAGE_KEY);
-
-        if (data) {
-            return JSON.parse(data);
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi CRUD Pengguna</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
         }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .hidden {
+            display: none;
+        }
+        #loginPage {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr.selected {
+            background-color: #e3f2fd;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        hr {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Halaman Login -->
+        <div id="loginPage">
+            <h2>🔐 Login Sistem</h2>
+            <hr>
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="loginUser" placeholder="Masukkan username">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="loginPass" placeholder="Masukkan password">
+            </div>
+            <button onclick="login()">Login</button>
+            <p style="margin-top: 15px; color: #666;">📝 Default: admin / admin</p>
+        </div>
 
-        const defaultData = [
-            {
-                id: "1",
-                user: "admin",
-                nama: "Administrator",
-                sandi: "admin",
-                status: "Aktif"
+        <!-- Halaman CRUD (Tersembunyi) -->
+        <div id="crudPage" class="hidden">
+            <h2>📋 Manajemen Pengguna</h2>
+            <hr>
+            
+            <!-- Form Input -->
+            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px; background: #f9f9f9;">
+                <h3>✏️ Form Data Pengguna</h3>
+                <div class="form-group">
+                    <label>ID:</label>
+                    <input type="text" id="id" placeholder="ID otomatis">
+                </div>
+                <div class="form-group">
+                    <label>Username:</label>
+                    <input type="text" id="user" placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <label>Nama Lengkap:</label>
+                    <input type="text" id="nama" placeholder="Nama lengkap">
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="sandi" placeholder="Password">
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="status">
+                        <option value="Aktif">Aktif</option>
+                        <option value="Nonaktif">Nonaktif</option>
+                    </select>
+                </div>
+                <div>
+                    <button onclick="addData()" class="btn-success">➕ Tambah</button>
+                    <button onclick="updateData()" class="btn-warning">✏️ Update</button>
+                    <button onclick="deleteData()" class="btn-danger">🗑️ Hapus</button>
+                    <button onclick="clearForm()">🧹 Bersihkan</button>
+                </div>
+            </div>
+
+            <!-- Tabel Data -->
+            <h3>📊 Daftar Pengguna</h3>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>USER</th>
+                        <th>NAMA</th>
+                        <th>SANDI</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = "users";
+        const columns = ["id", "user", "nama", "sandi", "status"];
+        let selectedIndex = -1;
+
+        function getData() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+
+                if (data) {
+                    return JSON.parse(data);
+                }
+
+                const defaultData = [
+                    {
+                        id: "1",
+                        user: "admin",
+                        nama: "Administrator",
+                        sandi: "admin",
+                        status: "Aktif"
+                    }
+                ];
+
+                localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(defaultData)
+                );
+
+                return defaultData;
+
+            } catch (e) {
+                console.error(e);
+                return [];
             }
-        ];
-
-        localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(defaultData)
-        );
-
-        return defaultData;
-
-    } catch (e) {
-        console.error(e);
-        return [];
-    }
-}
-
-function saveData(data){
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(data)
-    );
-}
-
-function renderTable(){
-
-    const data = getData();
-
-    let html = `
-        <thead>
-            <tr>
-                ${columns.map(col => `<th>${col.toUpperCase()}</th>`).join("")}
-            </tr>
-        </thead>
-        <tbody>
-    `;
-
-    data.forEach((row,index)=>{
-        html += `
-        <tr onclick="selectRow(${index})">
-            ${columns.map(col => `<td>${row[col] || ""}</td>`).join("")}
-        </tr>
-        `;
-    });
-
-    html += "</tbody>";
-
-    document.getElementById("dataTable").innerHTML = html;
-}
-
-function selectRow(index){
-
-    selectedIndex = index;
-
-    const row = getData()[index];
-
-    columns.forEach(col=>{
-        const el = document.getElementById(col);
-        if(el){
-            el.value = row[col] || "";
-        }
-    });
-
-    document
-    .querySelectorAll("#dataTable tbody tr")
-    .forEach(r=>r.classList.remove("selected"));
-
-    const selected =
-    document.querySelectorAll("#dataTable tbody tr")[index];
-
-    if(selected){
-        selected.classList.add("selected");
-    }
-}
-
-function getFormData(){
-
-    const obj = {};
-
-    columns.forEach(col=>{
-        obj[col] = document.getElementById(col).value;
-    });
-
-    return obj;
-}
-
-function addData(){
-
-    const data = getData();
-
-    data.push(getFormData());
-
-    saveData(data);
-
-    renderTable();
-
-    clearForm();
-}
-
-function updateData(){
-
-    if(selectedIndex === -1){
-        alert("Pilih data terlebih dahulu");
-        return;
-    }
-
-    const data = getData();
-
-    data[selectedIndex] = getFormData();
-
-    saveData(data);
-
-    renderTable();
-}
-
-function deleteData(){
-
-    if(selectedIndex === -1){
-        alert("Pilih data terlebih dahulu");
-        return;
-    }
-
-    const data = getData();
-
-    data.splice(selectedIndex,1);
-
-    saveData(data);
-
-    renderTable();
-
-    clearForm();
-}
-
-function clearForm(){
-
-    columns.forEach(col=>{
-
-        const el = document.getElementById(col);
-
-        if(el){
-            el.value = "";
         }
 
-    });
+        function saveData(data) {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(data)
+            );
+        }
 
-    document.getElementById("status").value = "Aktif";
+        function renderTable() {
+            const data = getData();
 
-    selectedIndex = -1;
-}
+            let html = `
+                <thead>
+                    <tr>
+                        ${columns.map(col => `<th>${col.toUpperCase()}</th>`).join("")}
+                    </tr>
+                </thead>
+                <tbody>
+            `;
 
-function login(){
+            if (data.length === 0) {
+                html += `
+                    <tr>
+                        <td colspan="${columns.length}" style="text-align: center;">Tidak ada data</td>
+                    </tr>
+                `;
+            } else {
+                data.forEach((row, index) => {
+                    html += `
+                        <tr onclick="selectRow(${index})">
+                            ${columns.map(col => `<td>${row[col] || ""}</td>`).join("")}
+                        </tr>
+                    `;
+                });
+            }
 
-    const username =
-        document.getElementById("loginUser").value;
+            html += "</tbody>";
 
-    const password =
-        document.getElementById("loginPass").value;
+            document.getElementById("dataTable").innerHTML = html;
+        }
 
-    const user = getData().find(
-        u =>
-        u.user === username &&
-        u.sandi === password &&
-        u.status === "Aktif"
-    );
+        function selectRow(index) {
+            selectedIndex = index;
 
-    if(user){
+            const row = getData()[index];
 
-        document
-        .getElementById("loginPage")
-        .classList.add("hidden");
+            columns.forEach(col => {
+                const el = document.getElementById(col);
+                if (el) {
+                    el.value = row[col] || "";
+                }
+            });
 
-        document
-        .getElementById("crudPage")
-        .classList.remove("hidden");
+            document
+                .querySelectorAll("#dataTable tbody tr")
+                .forEach(r => r.classList.remove("selected"));
 
-        renderTable();
+            const selected =
+                document.querySelectorAll("#dataTable tbody tr")[index];
 
-    }else{
+            if (selected) {
+                selected.classList.add("selected");
+            }
+        }
 
-        alert("Login gagal!");
-    }
-}
+        function getFormData() {
+            const obj = {};
 
-window.onload = function(){
-    getData();
-};
-</script>
+            columns.forEach(col => {
+                obj[col] = document.getElementById(col).value;
+            });
+
+            return obj;
+        }
+
+        function addData() {
+            const data = getData();
+            const formData = getFormData();
+            
+            // Generate ID otomatis jika kosong
+            if (!formData.id) {
+                const maxId = data.reduce((max, item) => Math.max(max, parseInt(item.id) || 0), 0);
+                formData.id = String(maxId + 1);
+            }
+            
+            data.push(formData);
+            saveData(data);
+            renderTable();
+            clearForm();
+        }
+
+        function updateData() {
+            if (selectedIndex === -1) {
+                alert("Pilih data terlebih dahulu");
+                return;
+            }
+
+            const data = getData();
+            data[selectedIndex] = getFormData();
+            saveData(data);
+            renderTable();
+            clearForm();
+        }
+
+        function deleteData() {
+            if (selectedIndex === -1) {
+                alert("Pilih data terlebih dahulu");
+                return;
+            }
+
+            if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+                const data = getData();
+                data.splice(selectedIndex, 1);
+                saveData(data);
+                renderTable();
+                clearForm();
+            }
+        }
+
+        function clearForm() {
+            columns.forEach(col => {
+                const el = document.getElementById(col);
+                if (el) {
+                    el.value = "";
+                }
+            });
+
+            document.getElementById("status").value = "Aktif";
+            selectedIndex = -1;
+        }
+
+        function login() {
+            const username = document.getElementById("loginUser").value;
+            const password = document.getElementById("loginPass").value;
+
+            const user = getData().find(
+                u =>
+                    u.user === username &&
+                    u.sandi === password &&
+                    u.status === "Aktif"
+            );
+
+            if (user) {
+                document.getElementById("loginPage").classList.add("hidden");
+                document.getElementById("crudPage").classList.remove("hidden");
+                renderTable();
+            } else {
+                alert("Login gagal! Periksa username dan password Anda.");
+            }
+        }
+
+        // Inisialisasi saat halaman dimuat
+        window.onload = function() {
+            getData();
+            // Reset form login
+            document.getElementById("loginUser").value = "";
+            document.getElementById("loginPass").value = "";
+            // Pastikan halaman login terlihat
+            document.getElementById("loginPage").classList.remove("hidden");
+            document.getElementById("crudPage").classList.add("hidden");
+        };
+    </script>
+</body>
+</html>
