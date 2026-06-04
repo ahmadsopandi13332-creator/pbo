@@ -1,222 +1,39 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRUD User LocalStorage</title>
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
-
-body{
-    background:#f5f5f5;
-    padding:20px;
-}
-
-.container{
-    max-width:1000px;
-    margin:auto;
-}
-
-.card{
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    margin-bottom:20px;
-    box-shadow:0 2px 10px rgba(0,0,0,.1);
-}
-
-h2{
-    margin-bottom:15px;
-}
-
-.form-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:10px;
-}
-
-input, select{
-    width:100%;
-    padding:10px;
-}
-
-button{
-    padding:10px 15px;
-    border:none;
-    cursor:pointer;
-    border-radius:5px;
-}
-
-.btn-primary{
-    background:#2196F3;
-    color:white;
-}
-
-.btn-warning{
-    background:orange;
-    color:white;
-}
-
-.btn-danger{
-    background:red;
-    color:white;
-}
-
-.btn-success{
-    background:green;
-    color:white;
-}
-
-.actions{
-    margin-top:15px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th,td{
-    border:1px solid #ddd;
-    padding:10px;
-    text-align:left;
-}
-
-tr:hover{
-    background:#eee;
-    cursor:pointer;
-}
-
-.selected{
-    background:#cce5ff !important;
-}
-
-.hidden{
-    display:none;
-}
-
-@media(max-width:768px){
-    table{
-        display:block;
-        overflow-x:auto;
-    }
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-
-<!-- LOGIN -->
-
-<div id="loginPage" class="card">
-<h2>Login</h2>
-
-<div class="form-grid">
-<input type="text" id="loginUser" placeholder="User">
-<input type="password" id="loginPass" placeholder="Password">
-</div>
-
-<div class="actions">
-<button class="btn-primary" onclick="login()">
-Login
-</button>
-</div>
-</div>
-
-<!-- CRUD -->
-
-<div id="crudPage" class="hidden">
-
-<div class="card">
-<h2>Manajemen User</h2>
-
-<div class="form-grid">
-
-<input type="text" id="id" placeholder="ID">
-
-<input type="text" id="user" placeholder="User">
-
-<input type="text" id="nama" placeholder="Nama">
-
-<input type="password" id="sandi" placeholder="Sandi">
-
-<select id="status">
-<option value="Aktif">Aktif</option>
-<option value="Nonaktif">Nonaktif</option>
-</select>
-
-</div>
-
-<div class="actions">
-
-<button class="btn-success" onclick="addData()">
-Tambah
-</button>
-
-<button class="btn-warning" onclick="updateData()">
-Update
-</button>
-
-<button class="btn-danger" onclick="deleteData()">
-Hapus
-</button>
-
-<button class="btn-primary" onclick="clearForm()">
-Reset
-</button>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>Data User</h2>
-
-<table id="dataTable"></table>
-
-</div>
-
-</div>
-
-</div>
-
 <script>
-
 const STORAGE_KEY = "users";
 
-const columns = [
-"id",
-"user",
-"nama",
-"sandi",
-"status"
-];
+const columns = ["id","user","nama","sandi","status"];
 
 let selectedIndex = -1;
 
-function getData(){
-    return JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-    ) || [
-        {
-            id:"1",
-            user:"admin",
-            nama:"Administrator",
-            sandi:"admin",
-            status:"Aktif"
+function getData() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+
+        if (data) {
+            return JSON.parse(data);
         }
-    ];
+
+        const defaultData = [
+            {
+                id: "1",
+                user: "admin",
+                nama: "Administrator",
+                sandi: "admin",
+                status: "Aktif"
+            }
+        ];
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(defaultData)
+        );
+
+        return defaultData;
+
+    } catch (e) {
+        console.error(e);
+        return [];
+    }
 }
 
 function saveData(data){
@@ -230,26 +47,21 @@ function renderTable(){
 
     const data = getData();
 
-    let html = "<thead><tr>";
-
-    columns.forEach(col=>{
-        html += `<th>${col.toUpperCase()}</th>`;
-    });
-
-    html += "</tr></thead><tbody>";
+    let html = `
+        <thead>
+            <tr>
+                ${columns.map(col => `<th>${col.toUpperCase()}</th>`).join("")}
+            </tr>
+        </thead>
+        <tbody>
+    `;
 
     data.forEach((row,index)=>{
-
         html += `
         <tr onclick="selectRow(${index})">
-
-        ${columns.map(col=>
-        `<td>${row[col]}</td>`
-        ).join("")}
-
+            ${columns.map(col => `<td>${row[col] || ""}</td>`).join("")}
         </tr>
         `;
-
     });
 
     html += "</tbody>";
@@ -261,29 +73,33 @@ function selectRow(index){
 
     selectedIndex = index;
 
-    const data = getData();
-
-    const row = data[index];
+    const row = getData()[index];
 
     columns.forEach(col=>{
-        document.getElementById(col).value =
-        row[col];
+        const el = document.getElementById(col);
+        if(el){
+            el.value = row[col] || "";
+        }
     });
 
-    document.querySelectorAll("tbody tr")
+    document
+    .querySelectorAll("#dataTable tbody tr")
     .forEach(r=>r.classList.remove("selected"));
 
-    document.querySelectorAll("tbody tr")[index]
-    .classList.add("selected");
+    const selected =
+    document.querySelectorAll("#dataTable tbody tr")[index];
+
+    if(selected){
+        selected.classList.add("selected");
+    }
 }
 
 function getFormData(){
 
-    let obj = {};
+    const obj = {};
 
     columns.forEach(col=>{
-        obj[col] =
-        document.getElementById(col).value;
+        obj[col] = document.getElementById(col).value;
     });
 
     return obj;
@@ -293,9 +109,7 @@ function addData(){
 
     const data = getData();
 
-    data.push(
-        getFormData()
-    );
+    data.push(getFormData());
 
     saveData(data);
 
@@ -306,15 +120,14 @@ function addData(){
 
 function updateData(){
 
-    if(selectedIndex < 0){
+    if(selectedIndex === -1){
         alert("Pilih data terlebih dahulu");
         return;
     }
 
     const data = getData();
 
-    data[selectedIndex] =
-    getFormData();
+    data[selectedIndex] = getFormData();
 
     saveData(data);
 
@@ -323,7 +136,7 @@ function updateData(){
 
 function deleteData(){
 
-    if(selectedIndex < 0){
+    if(selectedIndex === -1){
         alert("Pilih data terlebih dahulu");
         return;
     }
@@ -342,10 +155,16 @@ function deleteData(){
 function clearForm(){
 
     columns.forEach(col=>{
-        document.getElementById(col).value="";
+
+        const el = document.getElementById(col);
+
+        if(el){
+            el.value = "";
+        }
+
     });
 
-    document.getElementById("status").value="Aktif";
+    document.getElementById("status").value = "Aktif";
 
     selectedIndex = -1;
 }
@@ -353,18 +172,16 @@ function clearForm(){
 function login(){
 
     const username =
-    document.getElementById("loginUser").value;
+        document.getElementById("loginUser").value;
 
     const password =
-    document.getElementById("loginPass").value;
+        document.getElementById("loginPass").value;
 
-    const data = getData();
-
-    const user = data.find(
-        x =>
-        x.user === username &&
-        x.sandi === password &&
-        x.status === "Aktif"
+    const user = getData().find(
+        u =>
+        u.user === username &&
+        u.sandi === password &&
+        u.status === "Aktif"
     );
 
     if(user){
@@ -381,14 +198,11 @@ function login(){
 
     }else{
 
-        alert("Login gagal");
-
+        alert("Login gagal!");
     }
 }
 
-saveData(getData());
-
+window.onload = function(){
+    getData();
+};
 </script>
-
-</body>
-</html>
