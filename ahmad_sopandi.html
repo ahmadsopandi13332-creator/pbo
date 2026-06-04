@@ -94,11 +94,17 @@
         hr {
             margin: 20px 0;
         }
+        .login-info {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f4f8;
+            border-radius: 5px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Halaman Login -->
         <div id="loginPage">
             <h2>🔐 Login Sistem</h2>
             <hr>
@@ -111,15 +117,17 @@
                 <input type="password" id="loginPass" placeholder="Masukkan password">
             </div>
             <button onclick="login()">Login</button>
-            <p style="margin-top: 15px; color: #666;">📝 Default: admin / admin</p>
+            <div class="login-info">
+                <strong>📝 Informasi Login:</strong><br>
+                Username: <strong>admin</strong><br>
+                Password: <strong>admin</strong>
+            </div>
         </div>
 
-        <!-- Halaman CRUD (Tersembunyi) -->
         <div id="crudPage" class="hidden">
             <h2>📋 Manajemen Pengguna</h2>
             <hr>
             
-            <!-- Form Input -->
             <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px; background: #f9f9f9;">
                 <h3>✏️ Form Data Pengguna</h3>
                 <div class="form-group">
@@ -153,24 +161,8 @@
                 </div>
             </div>
 
-            <!-- Tabel Data -->
             <h3>📊 Daftar Pengguna</h3>
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>USER</th>
-                        <th>NAMA</th>
-                        <th>SANDI</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="5" style="text-align: center;">Loading...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <table id="dataTable">\u7684\u8868</table>
         </div>
     </div>
 
@@ -182,28 +174,14 @@
         function getData() {
             try {
                 const data = localStorage.getItem(STORAGE_KEY);
-
                 if (data) {
                     return JSON.parse(data);
                 }
-
                 const defaultData = [
-                    {
-                        id: "1",
-                        user: "admin",
-                        nama: "Administrator",
-                        sandi: "admin",
-                        status: "Aktif"
-                    }
+                    { id: "1", user: "admin", nama: "Administrator", sandi: "admin", status: "Aktif" }
                 ];
-
-                localStorage.setItem(
-                    STORAGE_KEY,
-                    JSON.stringify(defaultData)
-                );
-
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
                 return defaultData;
-
             } catch (e) {
                 console.error(e);
                 return [];
@@ -211,89 +189,48 @@
         }
 
         function saveData(data) {
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(data)
-            );
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
         function renderTable() {
             const data = getData();
-
-            let html = `
-                <thead>
-                    <tr>
-                        ${columns.map(col => `<th>${col.toUpperCase()}</th>`).join("")}
-                    </tr>
-                </thead>
-                <tbody>
-            `;
-
+            let html = `<thead><tr>${columns.map(col => `<th>${col.toUpperCase()}</th>`).join("")}</tr></thead><tbody>`;
             if (data.length === 0) {
-                html += `
-                    <tr>
-                        <td colspan="${columns.length}" style="text-align: center;">Tidak ada data</td>
-                    </tr>
-                `;
+                html += `<tr><td colspan="${columns.length}" style="text-align: center;">Tidak ada data</td></tr>`;
             } else {
                 data.forEach((row, index) => {
-                    html += `
-                        <tr onclick="selectRow(${index})">
-                            ${columns.map(col => `<td>${row[col] || ""}</td>`).join("")}
-                        </tr>
-                    `;
+                    html += `<tr onclick="selectRow(${index})">${columns.map(col => `<td>${row[col] || ""}</td>`).join("")}</tr>`;
                 });
             }
-
             html += "</tbody>";
-
             document.getElementById("dataTable").innerHTML = html;
         }
 
         function selectRow(index) {
             selectedIndex = index;
-
             const row = getData()[index];
-
             columns.forEach(col => {
                 const el = document.getElementById(col);
-                if (el) {
-                    el.value = row[col] || "";
-                }
+                if (el) el.value = row[col] || "";
             });
-
-            document
-                .querySelectorAll("#dataTable tbody tr")
-                .forEach(r => r.classList.remove("selected"));
-
-            const selected =
-                document.querySelectorAll("#dataTable tbody tr")[index];
-
-            if (selected) {
-                selected.classList.add("selected");
-            }
+            document.querySelectorAll("#dataTable tbody tr").forEach(r => r.classList.remove("selected"));
+            const selected = document.querySelectorAll("#dataTable tbody tr")[index];
+            if (selected) selected.classList.add("selected");
         }
 
         function getFormData() {
             const obj = {};
-
-            columns.forEach(col => {
-                obj[col] = document.getElementById(col).value;
-            });
-
+            columns.forEach(col => { obj[col] = document.getElementById(col).value; });
             return obj;
         }
 
         function addData() {
             const data = getData();
             const formData = getFormData();
-            
-            // Generate ID otomatis jika kosong
             if (!formData.id) {
                 const maxId = data.reduce((max, item) => Math.max(max, parseInt(item.id) || 0), 0);
                 formData.id = String(maxId + 1);
             }
-            
             data.push(formData);
             saveData(data);
             renderTable();
@@ -302,10 +239,9 @@
 
         function updateData() {
             if (selectedIndex === -1) {
-                alert("Pilih data terlebih dahulu");
+                alert("Pilih data terlebih dahulu dengan mengklik baris pada tabel");
                 return;
             }
-
             const data = getData();
             data[selectedIndex] = getFormData();
             saveData(data);
@@ -315,10 +251,9 @@
 
         function deleteData() {
             if (selectedIndex === -1) {
-                alert("Pilih data terlebih dahulu");
+                alert("Pilih data terlebih dahulu dengan mengklik baris pada tabel");
                 return;
             }
-
             if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
                 const data = getData();
                 data.splice(selectedIndex, 1);
@@ -331,11 +266,8 @@
         function clearForm() {
             columns.forEach(col => {
                 const el = document.getElementById(col);
-                if (el) {
-                    el.value = "";
-                }
+                if (el) el.value = "";
             });
-
             document.getElementById("status").value = "Aktif";
             selectedIndex = -1;
         }
@@ -343,14 +275,7 @@
         function login() {
             const username = document.getElementById("loginUser").value;
             const password = document.getElementById("loginPass").value;
-
-            const user = getData().find(
-                u =>
-                    u.user === username &&
-                    u.sandi === password &&
-                    u.status === "Aktif"
-            );
-
+            const user = getData().find(u => u.user === username && u.sandi === password && u.status === "Aktif");
             if (user) {
                 document.getElementById("loginPage").classList.add("hidden");
                 document.getElementById("crudPage").classList.remove("hidden");
@@ -360,13 +285,10 @@
             }
         }
 
-        // Inisialisasi saat halaman dimuat
         window.onload = function() {
             getData();
-            // Reset form login
             document.getElementById("loginUser").value = "";
             document.getElementById("loginPass").value = "";
-            // Pastikan halaman login terlihat
             document.getElementById("loginPage").classList.remove("hidden");
             document.getElementById("crudPage").classList.add("hidden");
         };
